@@ -91,16 +91,6 @@ Además, se contemplan mecanismos como:
 
 ---
 
-## 🚀 Tecnologías (Sujetas a ajuste)
-
-* Lenguaje: Java
-* Interfaz: 
-* Backend: Spring Boot (posible)
-* Base de datos: 
-* Contenedores: Docker (para base de datos)
-
----
-
 ## 📎 Notas
 
 Este proyecto tiene fines académicos y de portafolio, con un enfoque en buenas prácticas de diseño de software, arquitectura por capas y modelado de bases de datos.
