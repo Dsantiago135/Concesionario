@@ -66,12 +66,12 @@ El proyecto sigue una arquitectura por capas:
 
 ---
 ⚙️ Tecnologías Utilizadas
--Java
--Spring Boot
--Oracle Database
--JPA / Hibernate
--Maven
--PowerDesigner
+- Java
+- Spring Boot
+- Oracle Database
+- JPA / Hibernate
+- Maven
+- PowerDesigner
 ---
 # 🗄️ Diseño de Base de Datos
 
