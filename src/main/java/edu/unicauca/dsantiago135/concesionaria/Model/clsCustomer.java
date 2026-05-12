@@ -6,7 +6,6 @@ import lombok.Data;
 public class clsCustomer {
 
 //region Attributes
-
     private int attCustomerId;
     private String attName;
     private String attPhone;
