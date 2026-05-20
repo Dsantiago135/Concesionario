@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Oracle SQL Developer
+system*
+*.log
+*.tmp
+
+# Windows
+Thumbs.db
