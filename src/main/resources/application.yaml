@@ -1,6 +1,8 @@
 spring:
   application:
     name: concesionaria
+  main:
+    web-application-type: none
   datasource:
     url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
     username: Gerente
