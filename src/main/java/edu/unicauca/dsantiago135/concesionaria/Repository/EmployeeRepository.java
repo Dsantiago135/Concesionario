@@ -156,8 +156,8 @@ public class EmployeeRepository {
 
 	public boolean opEmployeeExist(int prmId){
 		try {
-			Boolean varResult = attFnEmployeeExist.executeFunction(Boolean.class, opToId(prmId));
-			return Boolean.TRUE.equals(varResult);
+			Integer varResult = attFnEmployeeExist.executeFunction(Integer.class, opToId(prmId));
+			return varResult != null && varResult == 1;
 		} catch (excDatabaseException e) {
 			throw new excDatabaseException(e.getMessage());
 		}

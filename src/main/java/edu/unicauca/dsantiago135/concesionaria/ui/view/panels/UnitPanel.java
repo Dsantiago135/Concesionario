@@ -4,6 +4,7 @@ import edu.unicauca.dsantiago135.concesionaria.Controller.clsController;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsUnit;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.TableHelper;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.UiKit;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -31,9 +32,30 @@ public class UnitPanel {
         var plate = UiKit.field("Placa (AAA000)");
         var color = UiKit.field("Color");
         var mileage = UiKit.field("Kilometraje");
-        var condition = UiKit.field("Condición (new/used)");
-        var status = UiKit.field("Estado (available/reserved/sold)");
+        //var condition = UiKit.field("Condición (new/used)");
+        ComboBox<String> condition = new ComboBox<>();
+        condition.getItems().addAll("new","used");
+        condition.setValue("new");
+        //var status = UiKit.field("Estado (available/reserved/sold)");
+        ComboBox<String> status = new ComboBox<>();
+        status.getItems().addAll("available","reserved","sold");
+        status.setValue("available");
         var dateEntry = UiKit.datePicker("Fecha ingreso");
+        
+        
+        Runnable clearForm = () -> {
+            id.clear();
+            vehicleId.clear();
+            dealershipId.clear();
+            plate.clear();
+            color.clear();
+            mileage.clear();
+            condition.setValue("new");
+            status.setValue("available");
+        };
+        
+        var clearBtn = UiKit.secondaryButton("Limpiar");
+        clearBtn.setOnAction(e -> clearForm.run());
 
         GridPane form = UiKit.formGrid(2);
         UiKit.addFormRow(form, 0, "ID unidad", id);
@@ -45,28 +67,41 @@ public class UnitPanel {
         UiKit.addFormRow(form, 6, "Condición", condition);
         UiKit.addFormRow(form, 7, "Estado", status);
         UiKit.addFormRow(form, 8, "Fecha ingreso", dateEntry);
+        
+        
+        GridPane.setColumnSpan(clearBtn, 2);
+        form.add(clearBtn, 0, 9);
 
-        var registerBtn = UiKit.managerButton("Registrar (opRegisterUnit)", () -> controller.opRegisterUnit(
-                UiKit.parseInt(id.getText(), "ID unidad"),
-                UiKit.parseInt(vehicleId.getText(), "ID vehículo"),
-                UiKit.parseInt(dealershipId.getText(), "ID concesionaria"),
-                UiKit.requireNonBlank(plate.getText(), "Placa"),
-                UiKit.requireNonBlank(color.getText(), "Color"),
-                UiKit.parseInt(mileage.getText(), "Kilometraje"),
-                UiKit.toSqlDate(dateEntry),
-                UiKit.requireNonBlank(condition.getText(), "Condición")));
+        var registerBtn = UiKit.managerButton("Registrar (opRegisterUnit)", () -> {
+        	controller.opRegisterUnit(
+        			UiKit.parseInt(id.getText(), "ID unidad"),
+        			UiKit.parseInt(vehicleId.getText(), "ID vehículo"),
+        			UiKit.parseInt(dealershipId.getText(), "ID concesionaria"),
+        			UiKit.requireNonBlank(plate.getText(), "Placa"),
+        			UiKit.requireNonBlank(color.getText(), "Color"),
+        			UiKit.parseInt(mileage.getText(), "Kilometraje"),
+        			UiKit.toSqlDate(dateEntry),
+        			condition.getValue());
+        	clearForm.run();
+        });
 
-        var updateBtn = UiKit.managerButton("Actualizar (opUpdateUnit)", () -> controller.opUpdateUnit(
-                UiKit.parseInt(id.getText(), "ID"),
-                UiKit.emptyToNull(plate.getText()),
-                UiKit.emptyToNull(color.getText()),
-                UiKit.parseIntOrNull(mileage.getText()),
-                UiKit.emptyToNull(condition.getText())));
+        var updateBtn = UiKit.managerButton("Actualizar (opUpdateUnit)", () -> {
+        	controller.opUpdateUnit(
+        			UiKit.parseInt(id.getText(), "ID"),
+        			UiKit.emptyToNull(plate.getText()),
+        			UiKit.emptyToNull(color.getText()),
+        			UiKit.parseIntOrNull(mileage.getText()),
+        			condition.getValue());
+        	clearForm.run();
+        });
 
         var updateStatusBtn = UiKit.primaryButton("Cambiar estado (opUpdateUnitStatus)");
-        updateStatusBtn.setOnAction(e -> UiKit.run(() -> controller.opUpdateUnitStatus(
-                UiKit.parseInt(id.getText(), "ID"),
-                UiKit.requireNonBlank(status.getText(), "Estado"))));
+        updateStatusBtn.setOnAction(e -> UiKit.run(() -> {
+        	controller.opUpdateUnitStatus(
+        			UiKit.parseInt(id.getText(), "ID"),
+        			status.getValue());
+        	clearForm.run();
+        }));
 
         var getByIdBtn = UiKit.secondaryButton("Por ID (opGetUnitById)");
         getByIdBtn.setOnAction(e -> UiKit.run(() -> {

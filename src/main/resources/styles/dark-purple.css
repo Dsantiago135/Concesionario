@@ -55,3 +55,20 @@
 .titled-pane > .content {
     -fx-background-color: #12121a;
 }
+
+
+
+.combo-box {
+    -fx-background-color: #1a1a26;
+    -fx-border-color: #2d2d3d;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #1a1a26;
+    -fx-text-fill: #f3f4f6;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #7c3aed;
+    -fx-text-fill: white;
+}
