@@ -4,6 +4,7 @@ import edu.unicauca.dsantiago135.concesionaria.Controller.clsController;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsDealership;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.TableHelper;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.UiKit;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -26,9 +27,23 @@ public class DealershipPanel {
     public VBox getContent() {
         var id = UiKit.field("ID");
         var name = UiKit.field("Nombre");
-        var state = UiKit.field("Estado (active/inactive)");
+        //var state = UiKit.field("Estado (active/inactive)");
+        ComboBox<String> state = new ComboBox<>();
+        state.getItems().addAll("active","inactive");
+        state.setValue("active");
         var address = UiKit.field("Dirección");
         var phone = UiKit.field("Teléfono");
+        
+        Runnable clearForm = () -> {
+            id.clear();
+            name.clear();
+            address.clear();
+            phone.clear();
+            state.setValue("active");
+        };
+        
+        var clearBtn = UiKit.secondaryButton("Limpiar");
+        clearBtn.setOnAction(e -> clearForm.run());
 
         GridPane registerForm = UiKit.formGrid(2);
         UiKit.addFormRow(registerForm, 0, "ID", id);
@@ -37,18 +52,30 @@ public class DealershipPanel {
         UiKit.addFormRow(registerForm, 3, "Dirección", address);
         UiKit.addFormRow(registerForm, 4, "Teléfono", phone);
 
-        var registerBtn = UiKit.managerButton("Registrar (opRegisterDealership)", () -> controller.opRegisterDealership(
-                UiKit.parseInt(id.getText(), "ID"),
-                UiKit.requireNonBlank(name.getText(), "Nombre"),
-                UiKit.requireNonBlank(state.getText(), "Estado"),
-                UiKit.requireNonBlank(address.getText(), "Dirección"),
-                UiKit.requireNonBlank(phone.getText(), "Teléfono")));
 
-        var updateBtn = UiKit.managerButton("Actualizar (opUpdateDealership)", () -> controller.opUpdateDealership(
-                UiKit.parseInt(id.getText(), "ID"),
-                UiKit.emptyToNull(name.getText()),
-                UiKit.emptyToNull(address.getText()),
-                UiKit.emptyToNull(phone.getText())));
+        GridPane.setColumnSpan(clearBtn, 2);
+        registerForm.add(clearBtn, 0, 5);
+
+        var registerBtn = UiKit.managerButton("Registrar (opRegisterDealership)", () -> {
+        	controller.opRegisterDealership(
+        			UiKit.parseInt(id.getText(), "ID"),
+        			UiKit.requireNonBlank(name.getText(), "Nombre"),
+        			state.getValue(),
+        			UiKit.requireNonBlank(address.getText(), "Dirección"),
+        			UiKit.requireNonBlank(phone.getText(), "Teléfono"));
+        	clearForm.run();
+        });
+        
+        
+
+        var updateBtn = UiKit.managerButton("Actualizar (opUpdateDealership)", () -> {
+        	controller.opUpdateDealership(
+        			UiKit.parseInt(id.getText(), "ID"),
+        			UiKit.emptyToNull(name.getText()),
+        			UiKit.emptyToNull(address.getText()),
+        			UiKit.emptyToNull(phone.getText()));
+        	clearForm.run();
+        });
 
         var disableBtn = UiKit.managerButton("Inactivar (opDisableDealership)", () ->
                 controller.opDisableDealership(UiKit.parseInt(id.getText(), "ID")));

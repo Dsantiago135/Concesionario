@@ -4,6 +4,7 @@ import edu.unicauca.dsantiago135.concesionaria.Controller.clsController;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsEmployee;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.TableHelper;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.UiKit;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -30,9 +31,30 @@ public class EmployeePanel {
         var name = UiKit.field("Nombre");
         var phone = UiKit.field("Teléfono");
         var salary = UiKit.field("Salario");
-        var role = UiKit.field("Rol (seller/manager)");
-        var state = UiKit.field("Estado (active/inactive)");
+        //var role = UiKit.field("Rol (seller/manager)");
+        ComboBox<String> role = new ComboBox<>();
+        role.getItems().setAll("seller","manager");
+        role.setValue("seller");
+        //var state = UiKit.field("Estado (active/inactive)");
+        ComboBox<String> state = new ComboBox<>();
+        state.getItems().addAll("active","inactive");
+        state.setValue("active");
         var hireDate = UiKit.datePicker("Fecha contratación");
+        
+        
+        Runnable clearForm = () -> { 
+            id.clear();
+            dealershipId.clear();
+            name.clear();
+            phone.clear();
+            salary.clear();
+            role.setValue("seller");
+            state.setValue("active");
+            hireDate.setValue(null);
+        };
+        
+        var clearBtn = UiKit.secondaryButton("Limpiar");
+        clearBtn.setOnAction(e -> clearForm.run());
 
         GridPane form = UiKit.formGrid(2);
         UiKit.addFormRow(form, 0, "ID empleado", id);
@@ -43,22 +65,32 @@ public class EmployeePanel {
         UiKit.addFormRow(form, 5, "Rol", role);
         UiKit.addFormRow(form, 6, "Estado", state);
         UiKit.addFormRow(form, 7, "Contratación", hireDate);
+        
+        
+        GridPane.setColumnSpan(clearBtn, 2);
+        form.add(clearBtn, 0, 8);
 
-        var registerBtn = UiKit.managerButton("Registrar (opRegisterEmployee)", () -> controller.opRegisterEmployee(
-                UiKit.parseInt(id.getText(), "ID"),
-                UiKit.parseInt(dealershipId.getText(), "ID concesionaria"),
-                UiKit.requireNonBlank(name.getText(), "Nombre"),
-                UiKit.requireNonBlank(phone.getText(), "Teléfono"),
-                UiKit.parseDouble(salary.getText(), "Salario"),
-                UiKit.toSqlDate(hireDate),
-                UiKit.requireNonBlank(role.getText(), "Rol"),
-                UiKit.requireNonBlank(state.getText(), "Estado")));
+        var registerBtn = UiKit.managerButton("Registrar (opRegisterEmployee)", () -> {
+        	controller.opRegisterEmployee(
+        			UiKit.parseInt(id.getText(), "ID"),
+        			UiKit.parseInt(dealershipId.getText(), "ID concesionaria"),
+        			UiKit.requireNonBlank(name.getText(), "Nombre"),
+        			UiKit.requireNonBlank(phone.getText(), "Teléfono"),
+        			UiKit.parseDouble(salary.getText(), "Salario"),
+        			UiKit.toSqlDate(hireDate),
+        			role.getValue(),
+        			state.getValue());
+        	clearForm.run();
+        });
 
-        var updateBtn = UiKit.managerButton("Actualizar (opUpdateEmployee)", () -> controller.opUpdateEmployee(
-                UiKit.parseInt(id.getText(), "ID"),
-                UiKit.emptyToNull(name.getText()),
-                UiKit.emptyToNull(phone.getText()),
-                UiKit.parseDoubleOrNull(salary.getText())));
+        var updateBtn = UiKit.managerButton("Actualizar (opUpdateEmployee)", () -> {
+        	controller.opUpdateEmployee(
+        			UiKit.parseInt(id.getText(), "ID"),
+        			UiKit.emptyToNull(name.getText()),
+        			UiKit.emptyToNull(phone.getText()),
+        			UiKit.parseDoubleOrNull(salary.getText()));
+        	clearForm.run();
+        });
 
         var disableBtn = UiKit.managerButton("Inactivar (opDisableEmployee)", () ->
                 controller.opDisableEmployee(UiKit.parseInt(id.getText(), "ID")));

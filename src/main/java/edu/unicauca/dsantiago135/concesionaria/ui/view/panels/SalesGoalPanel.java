@@ -4,6 +4,7 @@ import edu.unicauca.dsantiago135.concesionaria.Controller.clsController;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsSalesGoal;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.TableHelper;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.UiKit;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -28,10 +29,30 @@ public class SalesGoalPanel {
         var id = UiKit.field("ID meta");
         var dealershipId = UiKit.field("ID concesionaria");
         var employeeId = UiKit.field("ID empleado (vacío = meta concesionaria)");
-        var goalType = UiKit.field("Tipo (monthly/quarterly/yearly)");
+        //var goalType = UiKit.field("Tipo (monthly/quarterly/yearly)");
+        ComboBox<String> goalType = new ComboBox<>();
+        goalType.getItems().addAll("monthly","quarterly","yearly");
+        goalType.setValue("monthly");
         var target = UiKit.field("Valor objetivo");
-        var stateFilter = UiKit.field("Estado filtro (active/inactive/complete)");
+        //var stateFilter = UiKit.field("Estado filtro (active/inactive/complete)");
+        ComboBox<String> stateFilter = new ComboBox<>();
+        stateFilter.getItems().addAll("active","inactive","complete");
+        stateFilter.setValue("active");
         var startDate = UiKit.datePicker("Fecha inicio");
+        
+        
+        Runnable clearForm = () -> {
+            id.clear();
+            dealershipId.clear();
+            employeeId.clear();
+            goalType.setValue("monthly");
+            target.clear();
+            stateFilter.setValue("new");
+            startDate.setValue(null);
+        };
+        
+        var clearBtn = UiKit.secondaryButton("Limpiar");
+        clearBtn.setOnAction(e -> clearForm.run());
 
         GridPane form = UiKit.formGrid(2);
         UiKit.addFormRow(form, 0, "ID meta", id);
@@ -41,18 +62,28 @@ public class SalesGoalPanel {
         UiKit.addFormRow(form, 4, "Objetivo", target);
         UiKit.addFormRow(form, 5, "Estado filtro", stateFilter);
         UiKit.addFormRow(form, 6, "Inicio", startDate);
+        
+        
+        GridPane.setColumnSpan(clearBtn, 2);
+        form.add(clearBtn, 0, 7);
 
-        var registerBtn = UiKit.managerButton("Registrar (opRegisterSalesGoal)", () -> controller.opRegisterSalesGoal(
-                UiKit.parseInt(dealershipId.getText(), "ID concesionaria"),
-                UiKit.parseIntOrNull(employeeId.getText()),
-                UiKit.requireNonBlank(goalType.getText(), "Tipo"),
-                UiKit.parseInt(target.getText(), "Objetivo"),
-                UiKit.toSqlDate(startDate)));
+        var registerBtn = UiKit.managerButton("Registrar (opRegisterSalesGoal)", () -> {
+        	controller.opRegisterSalesGoal(
+        			UiKit.parseInt(dealershipId.getText(), "ID concesionaria"),
+        			UiKit.parseIntOrNull(employeeId.getText()),
+        			goalType.getValue(),
+        			UiKit.parseInt(target.getText(), "Objetivo"),
+        			UiKit.toSqlDate(startDate));
+        	clearForm.run();
+        });
 
-        var updateBtn = UiKit.managerButton("Actualizar (opUpdateSalesGoal)", () -> controller.opUpdateSalesGoal(
-                UiKit.parseInt(id.getText(), "ID"),
-                UiKit.parseIntOrNull(target.getText()),
-                UiKit.emptyToNull(goalType.getText())));
+        var updateBtn = UiKit.managerButton("Actualizar (opUpdateSalesGoal)", () -> {
+        	controller.opUpdateSalesGoal(
+        			UiKit.parseInt(id.getText(), "ID"),
+        			UiKit.parseIntOrNull(target.getText()),
+        			goalType.getValue());
+        	clearForm.run();
+        });
 
         var disableBtn = UiKit.managerButton("Inactivar (opDisableSalesGoal)", () ->
                 controller.opDisableSalesGoal(UiKit.parseInt(id.getText(), "ID")));
@@ -73,7 +104,7 @@ public class SalesGoalPanel {
         var byStateBtn = UiKit.secondaryButton("Por estado (opGetSalesGoalsByState)");
         byStateBtn.setOnAction(e -> UiKit.runSilent(() ->
                 TableHelper.setItems(table, controller.opGetSalesGoalsByState(
-                        UiKit.requireNonBlank(stateFilter.getText(), "Estado filtro")))));
+                        stateFilter.getValue()))));
 
         VBox box = UiKit.panelVBox(
                 UiKit.title("Metas de ventas"),

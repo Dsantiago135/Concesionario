@@ -5,6 +5,7 @@ import edu.unicauca.dsantiago135.concesionaria.Model.clsSale;
 import edu.unicauca.dsantiago135.concesionaria.ui.service.SessionContext;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.TableHelper;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.UiKit;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -31,13 +32,30 @@ public class SalePanel {
         var employeeId = UiKit.field("ID empleado (vacío = sesión actual)");
         var unitId = UiKit.field("ID unidad");
         var price = UiKit.field("Precio");
-        var statusFilter = UiKit.field("Estado filtro (confirmed/cancelled/inprogress)");
+        //var statusFilter = UiKit.field("Estado filtro (confirmed/cancelled/inprogress)");
+        ComboBox<String> statusFilter = new ComboBox<>();
+        statusFilter.getItems().addAll("confirmed","cancelled","inprogress");
+        statusFilter.setValue("confirmed");
         var dateEnd = UiKit.datePicker("Fecha fin reserva");
+        
+        
+        Runnable clearForm = () ->  {
+            saleId.clear();
+            customerId.clear();
+            employeeId.clear();
+            unitId.clear();
+            price.clear();
+            statusFilter.setValue("new");
+            dateEnd.setValue(null);
+        };
 
         if (!SessionContext.isManager()) {
             employeeId.setText(String.valueOf(SessionContext.getCurrentUser().employeeId()));
             employeeId.setEditable(false);
         }
+        
+        var clearBtn = UiKit.secondaryButton("Limpiar");
+        clearBtn.setOnAction(e -> clearForm.run());
 
         GridPane form = UiKit.formGrid(2);
         UiKit.addFormRow(form, 0, "ID venta", saleId);
@@ -47,21 +65,30 @@ public class SalePanel {
         UiKit.addFormRow(form, 4, "Precio", price);
         UiKit.addFormRow(form, 5, "Estado filtro", statusFilter);
         UiKit.addFormRow(form, 6, "Fin reserva", dateEnd);
+        
+        GridPane.setColumnSpan(clearBtn, 2);
+        form.add(clearBtn, 0, 7);
 
         var registerSaleBtn = UiKit.primaryButton("Venta directa (opRegisterSale)");
-        registerSaleBtn.setOnAction(e -> UiKit.run(() -> controller.opRegisterSale(
-                UiKit.parseInt(customerId.getText(), "ID cliente"),
-                resolveEmployeeId(employeeId),
-                UiKit.parseInt(unitId.getText(), "ID unidad"),
-                UiKit.parseDouble(price.getText(), "Precio"))));
+        registerSaleBtn.setOnAction(e -> UiKit.run(() -> {
+        	controller.opRegisterSale(
+        			UiKit.parseInt(customerId.getText(), "ID cliente"),
+        			resolveEmployeeId(employeeId),
+        			UiKit.parseInt(unitId.getText(), "ID unidad"),
+        			UiKit.parseDouble(price.getText(), "Precio"));
+        	clearForm.run();
+        }));
 
         var registerResBtn = UiKit.primaryButton("Reservar (opRegisterReservation)");
-        registerResBtn.setOnAction(e -> UiKit.run(() -> controller.opRegisterReservation(
-                UiKit.parseInt(customerId.getText(), "ID cliente"),
-                resolveEmployeeId(employeeId),
-                UiKit.parseInt(unitId.getText(), "ID unidad"),
-                UiKit.parseDouble(price.getText(), "Precio"),
-                UiKit.toSqlDate(dateEnd))));
+        registerResBtn.setOnAction(e -> UiKit.run(() -> {
+        	controller.opRegisterReservation(
+        			UiKit.parseInt(customerId.getText(), "ID cliente"),
+        			resolveEmployeeId(employeeId),
+        			UiKit.parseInt(unitId.getText(), "ID unidad"),
+        			UiKit.parseDouble(price.getText(), "Precio"),
+        			UiKit.toSqlDate(dateEnd));
+        	clearForm.run();
+        }));
 
         var completeBtn = UiKit.primaryButton("Completar reserva (opCompleteReservation)");
         completeBtn.setOnAction(e -> UiKit.run(() ->
@@ -84,7 +111,7 @@ public class SalePanel {
         var byStatusBtn = UiKit.secondaryButton("Por estado (opGetSalesByStatus)");
         byStatusBtn.setOnAction(e -> UiKit.runSilent(() ->
                 TableHelper.setItems(table, controller.opGetSalesByStatus(
-                        UiKit.requireNonBlank(statusFilter.getText(), "Estado filtro")))));
+                        statusFilter.getValue()))));
 
         VBox box = UiKit.panelVBox(
                 UiKit.title("Ventas y reservas"),
