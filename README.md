@@ -2,9 +2,9 @@
 
 ## 📌 Descripción del Proyecto
 
-Este proyecto consiste en el análisis, diseño y desarrollo de un sistema de información orientado a la gestión de una empresa dedicada a la comercialización de vehículos mediante múltiples concesionarias ubicadas dentro de una misma ciudad.
+Sistema de información desarrollado para administrar una empresa dedicada a la comercialización de vehículos mediante múltiples concesionarias.
 
-El sistema centraliza la información relacionada con inventario, ventas, empleados, clientes y metas comerciales, con el objetivo de mejorar la consistencia de los datos, optimizar la toma de decisiones y facilitar el control operativo del negocio.
+La aplicación centraliza la gestión de clientes, empleados, vehículos, unidades físicas, ventas y metas comerciales, permitiendo mantener la integridad de la información y optimizar los procesos operativos de la organización.
 
 ---
 
@@ -12,45 +12,84 @@ El sistema centraliza la información relacionada con inventario, ventas, emplea
 
 ## Objetivo General
 
-Desarrollar un sistema capaz de gestionar de manera eficiente las operaciones de una empresa de venta de vehículos, garantizando integridad, consistencia y disponibilidad de la información.
+Desarrollar un sistema que permita gestionar de manera eficiente las operaciones comerciales de una red de concesionarias de vehículos, garantizando la consistencia, disponibilidad e integridad de los datos.
 
 ## Objetivos Específicos
 
-- Centralizar la información de múltiples concesionarias.
-- Gestionar el inventario de vehículos en tiempo real.
-- Registrar y administrar las ventas realizadas.
-- Gestionar la información de empleados y clientes.
-- Asignar y monitorear metas comerciales.
-- Generar información útil para reportes y análisis de rendimiento.
+* Centralizar la información de todas las concesionarias.
+* Gestionar el inventario de vehículos y unidades disponibles.
+* Registrar y administrar procesos de venta.
+* Gestionar empleados y clientes.
+* Administrar metas comerciales.
+* Generar información para análisis y control de gestión.
 
 ---
 
 # 🧠 Problemática
 
-Actualmente, cada concesionaria administra su información de manera independiente, lo que genera distintos problemas operativos como:
+La gestión independiente de cada concesionaria genera dificultades como:
 
-- Inconsistencias en el inventario de vehículos.
-- Falta de actualización inmediata tras una venta.
-- Dificultades para consolidar la información comercial.
-- Problemas en el seguimiento del rendimiento del personal.
-- Limitaciones para el análisis administrativo y financiero.
+* Inconsistencias en el inventario.
+* Información desactualizada después de una venta.
+* Duplicidad de datos.
+* Dificultad para consolidar información comercial.
+* Limitaciones para realizar seguimiento al desempeño de vendedores y concesionarias.
 
-La ausencia de un sistema centralizado afecta la confiabilidad del inventario y dificulta la gestión eficiente del negocio.
+Para solucionar estas problemáticas se implementa un sistema centralizado respaldado por una base de datos Oracle.
 
 ---
 
-# 🏗️ Alcance del Sistema
+# 🏗️ Funcionalidades Implementadas
 
-El sistema permitirá gestionar información relacionada con:
+## Gestión de Concesionarias
 
-- Concesionarias
-- Vehículos (modelo)
-- Unidades de vehículos (instancias físicas)
-- Clientes
-- Empleados (gerentes y vendedores)
-- Ventas
-- Metas comerciales
-- Inventario de vehículos
+* Registro de concesionarias.
+* Consulta y actualización de información.
+* Control de estado.
+
+## Gestión de Clientes
+
+* Registro de clientes.
+* Consulta individual y general.
+* Actualización de datos.
+* Control de clientes activos e inactivos.
+
+## Gestión de Empleados
+
+* Registro de vendedores y gerentes.
+* Asociación de empleados a concesionarias.
+* Validación de roles.
+* Administración de estados.
+
+## Gestión de Vehículos
+
+* Registro de modelos de vehículos.
+* Gestión de marca, modelo y características.
+
+## Gestión de Unidades
+
+* Administración de unidades físicas.
+* Asociación a concesionarias.
+* Control de disponibilidad.
+
+## Gestión de Ventas
+
+* Registro de ventas.
+* Asociación con cliente, vendedor y unidad.
+* Control de estados de venta:
+
+  * confirmed
+  * cancelled
+  * inprogress
+
+## Gestión de Metas Comerciales
+
+* Asignación de metas a empleados o concesionarias.
+* Manejo de metas:
+
+  * monthly
+  * quarterly
+  * yearly
 
 ---
 
@@ -58,60 +97,133 @@ El sistema permitirá gestionar información relacionada con:
 
 El proyecto sigue una arquitectura por capas:
 
-- **UI (Interfaz de Usuario):** Encargada de la interacción con el usuario.
-- **Controller (Facade):** Punto central de acceso a las operaciones del sistema.
-- **Domain / Model:** Contiene entidades y reglas de negocio.
-- **Services:** Operaciones reutilizables y lógica de apoyo.
-- **Persistence / System:** Acceso a base de datos y tecnologías externas.
-
----
-⚙️ Tecnologías Utilizadas
-- Java
-- Spring Boot
-- Oracle Database
-- JPA / Hibernate
-- Maven
-- PowerDesigner
----
-# 🗄️ Diseño de Base de Datos
-
-El sistema utiliza un modelo relacional que contempla:
-
-- Separación entre vehículo (modelo) y unidad física.
-- Control de disponibilidad mediante estados de las unidades.
-- Relaciones entre ventas, clientes, empleados y concesionarias.
-- Estructuras preparadas para consultas y reportes administrativos.
-
-Además, la base de datos incluye:
-
-- Restricciones de integridad.
-- Triggers para automatización de estados.
-- Procedimientos y funciones PL/SQL.
-- Vistas para reportes y consultas de gestión.
+```text
+├── Controller
+│   └── Fachada principal del sistema
+│
+├── Service
+│   └── Lógica de negocio y validaciones
+│
+├── Repository
+│   └── Acceso a datos y procedimientos Oracle
+│
+├── Model
+│   └── Entidades del dominio
+│
+└── Error
+    └── Manejo de excepciones personalizadas
+```
 
 ---
 
-# 📋 Reglas de Negocio Principales
+# 📂 Estructura del Proyecto
 
-- Cada concesionaria debe tener exactamente un gerente asignado.
-- Un vendedor pertenece a una única concesionaria.
-- Una unidad de vehículo solo puede venderse una vez.
-- Cada venta debe estar asociada a un cliente y un vendedor.
-- El estado de una unidad se actualiza automáticamente después de una venta.
-- Un cliente puede realizar múltiples compras.
-- Las metas comerciales pueden asignarse a empleados o concesionarias.
+```text
+src
+│
+├── main
+│   ├── java
+│   │   └── concesionaria
+│   │       ├── Controller
+│   │       ├── Service
+│   │       ├── Repository
+│   │       ├── Model
+│   │       └── Error
+│   │
+│   └── resources
+│       └── application.yaml
+│
+└── test
+```
+
+```text
+DataBase
+│
+├── DDL.sql
+├── DML.sql
+├── ejemplares.sql
+│
+├── PKGCUSTOMER.sql
+├── PKGDEALERSHIP.sql
+├── PKGEMPLOYEE.sql
+├── PKGSALE.sql
+├── PKGSALESGOAL.sql
+├── PKGUNIT.sql
+├── PKGVEHICLE.sql
+└── PKGVALIDACIONES.sql
+```
+
+---
+
+# 🗄️ Base de Datos
+
+La solución utiliza Oracle Database como sistema gestor de base de datos.
+
+## Entidades Principales
+
+* Customer
+* Dealership
+* Employee
+* Vehicle
+* Unit
+* Sale
+* SalesGoal
+
+## Características Implementadas
+
+* Restricciones de integridad.
+* Llaves primarias y foráneas.
+* Validaciones mediante PL/SQL.
+* Procedimientos almacenados.
+* Paquetes Oracle.
+* Manejo de estados.
+* Automatización de procesos mediante triggers.
+* Consultas de gestión mediante vistas.
+
+---
+
+# ⚙️ Tecnologías Utilizadas
+
+* Java
+* Spring Boot
+* Maven
+* Oracle Database
+* PL/SQL
+* PowerDesigner
+* Git
+* GitHub
+
+---
+
+# 🚀 Ejecución del Proyecto
+
+## Requisitos
+
+* JDK 17 o superior
+* Maven
+* Oracle Database
+* SQL Developer (opcional)
+
+## Pasos
+
+1. Crear la base de datos Oracle.
+2. Ejecutar el script `DDL.sql`.
+3. Ejecutar los paquetes PL/SQL.
+4. Ejecutar los scripts de inserción de datos.
+5. Configurar la conexión en `application.yaml`.
+6. Compilar y ejecutar:
+
+```bash
+mvn clean install
+mvn spring-boot:run
+```
 
 ---
 
 # 📊 Modelos del Sistema
 
-## Modelo Físico de Base de Datos
-<img width="484" height="422" alt="{180107CA-F56A-4E8B-8EF3-46DBB50FD476}" src="https://github.com/user-attachments/assets/bdccb3d8-1ff5-4a39-a635-6bb608f4933e" />
-
-## Modelo de clases y métodos
-SUEJETOS A CAMBIOS
-
-<img width="414" height="430" alt="{F1D5DEDA-4960-4647-B996-CBEC135FEC3C}" src="https://github.com/user-attachments/assets/b9d464f4-32e4-451b-89fe-8c799438adbe" />
----
-<img width="591" height="417" alt="{0589C5EA-F450-467C-9A45-C7174A8310B8}" src="https://github.com/user-attachments/assets/261f7cbe-86a6-4cee-b951-a9f3deeebba1" />
----
+* Modelo Conceptual
+* Modelo Físico
+* Diagrama de Clases
+* Diagrama de Métodos
+* Arquitectura por Capas
