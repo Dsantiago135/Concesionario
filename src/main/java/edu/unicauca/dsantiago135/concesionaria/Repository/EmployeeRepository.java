@@ -10,12 +10,11 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import edu.unicauca.dsantiago135.concesionaria.Error.excDatabaseException;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsDealership;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsEmployee;
 
 @Repository
-public class EmployeeRepository {
+public class EmployeeRepository extends BaseRepository<clsEmployee>{
 
 	// region ATTRIBUTES
 	private final JdbcTemplate attJdbcTemplate;
@@ -131,83 +130,35 @@ public class EmployeeRepository {
 
 	// region PROCEDURES
 	public void opRegisterEmployee(clsEmployee prmEmployee){
-		try {
-			attSpRegisterEmployee.execute(opToParams(prmEmployee));
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opRegister(attSpRegisterEmployee, opToParams(prmEmployee));
 	}
 
 	public void opUpdateEmployee(clsEmployee prmEmployee){
-		try {
-			attSpUpdateEmployee.execute(opToParams(prmEmployee));
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opUpdate(attSpUpdateEmployee, opToParams(prmEmployee));
 	}
 	
 	public void opDisableEmployee(int prmId){
-		try {
-			attSpDisableEmployee.execute(opToId(prmId));
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opDisable(attSpDisableEmployee, opToId(prmId));
 	}
 
 	public boolean opEmployeeExist(int prmId){
-		try {
-			Integer varResult = attFnEmployeeExist.executeFunction(Integer.class, opToId(prmId));
-			return varResult != null && varResult == 1;
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opExist(attFnEmployeeExist, opToId(prmId)); 
 	}
 
 	public clsEmployee opGetEmployeeById(int prmId){
-		try {
-			Map<String, Object> varResult = attFnGetEmployeeById.execute(opToId(prmId));
-			@SuppressWarnings("unchecked")
-			List<clsEmployee> varList = (List<clsEmployee>) varResult.get("return");
-			if (varList == null || varList.isEmpty()) return null;
-			return varList.get(0);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetById(attFnGetEmployeeById, opToId(prmId));
 	}
 
 	public List<clsEmployee> opGetEmployeesByDealership(int prmDealershipId){
-		try {
-			MapSqlParameterSource varParams = new MapSqlParameterSource();
-			varParams.addValue("P_DEA_ID", prmDealershipId);
-			Map<String, Object> varResult = attFnGetEmployeesByDealership.execute(varParams);
-			@SuppressWarnings("unchecked")
-			List<clsEmployee> varEmployee = (List<clsEmployee>) varResult.get("return");
-			return varEmployee != null? varEmployee: List.of();
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetByFilter(attFnGetEmployeesByDealership, opToId(prmDealershipId));
 	}
 
 	public List<clsEmployee> opGetAllEmployees(){
-		try {
-			Map<String, Object> varResult = attFnGetAllEmployees.execute();
-			@SuppressWarnings("unchecked")
-			List<clsEmployee> varEmployee = (List<clsEmployee>) varResult.get("return");
-			return varEmployee != null? varEmployee: List.of();
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetAll(attFnGetAllEmployees);
 	}
 
 	public List<clsEmployee> opGetEmployeesAboveAvg(){
-		try {
-			Map<String, Object> varResult = attFnGetEmployeesAboveAvg.execute();
-			@SuppressWarnings("unchecked")
-			List<clsEmployee> varEmployee = (List<clsEmployee>) varResult.get("return");
-			return varEmployee != null? varEmployee: List.of();
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetAll(attFnGetEmployeesAboveAvg);
 	}
 	// endregion
 }

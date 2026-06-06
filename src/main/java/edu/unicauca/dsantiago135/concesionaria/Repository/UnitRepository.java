@@ -10,13 +10,12 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import edu.unicauca.dsantiago135.concesionaria.Error.excDatabaseException;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsDealership;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsUnit;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsVehicle;
 
 @Repository
-public class UnitRepository {
+public class UnitRepository extends BaseRepository<clsUnit>{
 
 	// region ATTRIBUTES
 	private final JdbcTemplate attJdbcTemplate;
@@ -134,76 +133,35 @@ public class UnitRepository {
 
 	// region PROCEDURES
 	public void opRegisterUnit(clsUnit prmUnit){
-		try {
-			attSpRegisterUnit.execute(opToParams(prmUnit));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opRegister(attSpRegisterUnit, opToParams(prmUnit));
 	}
 	
 	public void opUpdateUnit(clsUnit prmUnit){
-		try {
-			attSpUpdateUnit.execute(opToParams(prmUnit));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opUpdate(attSpUpdateUnit, opToParams(prmUnit));
 	}
 	
 	public void opUpdateUnitStatus(int prmId, String prmStatus){
 		MapSqlParameterSource varParams = new MapSqlParameterSource();
 		varParams.addValue("P_UNIT_ID", prmId);
 		varParams.addValue("P_UNIT_STATUS", prmStatus);
-		try {
-			attSpUpdateUnitStatus.execute(varParams);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opUpdate(attSpUpdateUnitStatus, varParams);
 	}
 	
 	public boolean opUnitExist(int prmId){
-		try {
-			Boolean varResult = attFnUnitExist.executeFunction(Boolean.class,opToId(prmId));
-			return Boolean.TRUE.equals(varResult);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opExist(attFnUnitExist, opToId(prmId));
 	}
 	
 	public clsUnit opGetUnitById(int prmId){
-		try {
-			Map<String, Object> varResult = attFnGetUnitById.execute(opToId(prmId));
-			@SuppressWarnings("unchecked")
-			List<clsUnit> varList = (List<clsUnit>) varResult.get("return");
-			if (varList == null || varList.isEmpty()) return null;
-			return varList.get(0);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetById(attFnGetUnitById, opToId(prmId));
 	}
 	
 	public List<clsUnit> opGetAllUnits(){
-		try {
-			Map<String, Object> varResult = attFnGetAllUnits.execute();
-			@SuppressWarnings("unchecked")
-			List<clsUnit> varUnite = (List<clsUnit>) varResult.get("return");
-			return varUnite != null? varUnite: List.of();
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetAll(attFnGetAllUnits);
 	}
 	
 	public List<clsUnit> opGetUnitsByStatus(String prmStatus){
-		try {
-			MapSqlParameterSource varParams = new MapSqlParameterSource();
-			varParams.addValue("P_UNIT_STATUS", prmStatus);
-			Map<String, Object> varResult = attFnGetUnitsByStatus.execute(varParams);
-			@SuppressWarnings("unchecked")
-			List<clsUnit> varUnite = (List<clsUnit>) varResult.get("return");
-			return varUnite != null? varUnite: List.of();
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		MapSqlParameterSource varStatus = new MapSqlParameterSource().addValue("P_UNIT_STATUS", prmStatus);
+		return opGetByFilter(attFnGetUnitsByStatus, varStatus);
 	}
 	// endregion
-
 }

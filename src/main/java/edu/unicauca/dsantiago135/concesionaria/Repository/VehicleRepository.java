@@ -11,11 +11,10 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
-import edu.unicauca.dsantiago135.concesionaria.Error.excDatabaseException;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsVehicle;
 
 @Repository
-public class VehicleRepository {
+public class VehicleRepository extends BaseRepository<clsVehicle>{
 
 	// region ATTRIBUTES
 	private final JdbcTemplate attJdbcTemplate;
@@ -122,60 +121,28 @@ public class VehicleRepository {
 	// endregion
 
 	// region PROCEDURES
-	public void  opRegisterVehicle (clsVehicle prmVehicle)throws  excDatabaseException{
-		try {
-			attSpRegisterVehicle.execute(opToParams(prmVehicle));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+	public void opRegisterVehicle (clsVehicle prmVehicle){
+		opRegister(attSpRegisterVehicle, opToParams(prmVehicle));
 	}
 
-	public void  opUpdateVehicle(clsVehicle prmVehicle){
-		try {
-			attSpUpdateVehicle.execute(opToParams(prmVehicle));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+	public void opUpdateVehicle(clsVehicle prmVehicle){
+		opUpdate(attSpUpdateVehicle, opToParams(prmVehicle));
 	}
 
 	public void  opDisableVehicle(int prmId){
-		try {
-			attSpDisableVehicle.execute(opToId(prmId));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opDisable(attSpDisableVehicle, opToId(prmId));
 	}
 
 	public boolean  opVehicleExist(int prmId){
-		try {
-			Boolean varResult = attFnVehicleExist.executeFunction(Boolean.class,opToId(prmId));
-			return Boolean.TRUE.equals(varResult);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opExist(attFnVehicleExist, opToId(prmId));
 	}
 
 	public clsVehicle  opGetVehicleById(int prmId){
-		try {
-			Map<String, Object> varResult = attFnGetVehicleById.execute(opToId(prmId));
-			@SuppressWarnings("unchecked")
-			List<clsVehicle> varList = (List<clsVehicle>) varResult.get("return");
-			if (varList == null || varList.isEmpty()) return null;
-			return varList.get(0);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetById(attFnGetVehicleById, opToId(prmId));
 	}
 
 	public List<clsVehicle>  opGetAllVehicles(){
-		try {
-			Map<String, Object> varResult = attFnGetAllVehicles.execute();
-			@SuppressWarnings("unchecked")
-			List<clsVehicle> varVehicles = (List<clsVehicle>) varResult.get("return");
-			return varVehicles!=null? varVehicles: List.of();
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetAll(attFnGetAllVehicles);
 	}
 	// endregion
 }

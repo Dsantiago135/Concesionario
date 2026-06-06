@@ -3,7 +3,6 @@ package edu.unicauca.dsantiago135.concesionaria.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,11 +10,10 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
-import edu.unicauca.dsantiago135.concesionaria.Error.excDatabaseException;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsCustomer;
 
 @Repository
-public class CustomerRepository {
+public class CustomerRepository extends BaseRepository<clsCustomer> {
 
 	// region ATTRIBUTES
 	private final JdbcTemplate attJdbcTemplate;
@@ -109,59 +107,27 @@ public class CustomerRepository {
 
 	// region PROCEDURES
 	public void opRegisterCustomer(clsCustomer prmCustomer) {
-		try {
-			attSpRegisterCustomer.execute(opToParams(prmCustomer));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+			opRegister(attSpRegisterCustomer, opToParams(prmCustomer));
 	}
 
 	public void opUpdateCustomer(clsCustomer prmCustomer){
-		try {
-			attSpUpdateCustomer.execute(opToParams(prmCustomer));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opUpdate(attSpUpdateCustomer, opToParams(prmCustomer));
 	}
 
 	public void opDisableCustomer(int prmId){
-		try {
-			attSpDisableCustomer.execute(opToId(prmId));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opDisable(attSpDisableCustomer, opToId(prmId));
 	}
 
 	public boolean opCustomerExist(int prmId)  {
-		try {
-			Boolean varResult = attFnCustomerExist.executeFunction(Boolean.class, opToId(prmId));
-			return Boolean.TRUE.equals(varResult);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opExist(attFnCustomerExist, opToId(prmId));
   	}
 
 	public clsCustomer opGetCustomerById(int prmId){
-		try {
-			Map<String, Object> varResult = attFnGetCustomerById.execute(opToId(prmId));
-			@SuppressWarnings("unchecked")
-			List<clsCustomer> varList = (List<clsCustomer>) varResult.get("return");
-			if (varList == null || varList.isEmpty()) return null;
-			return varList.get(0);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
-}
+		return opGetById(attFnGetCustomerById, opToId(prmId));
+	}
 
 	public List<clsCustomer> opGetAllCustomers() {
-		try {
-			Map<String, Object> varResult = attFnGetAllCustomers.execute();
-			@SuppressWarnings("unchecked")
-			List<clsCustomer> varCustomers = (List<clsCustomer>) varResult.get("return");
-			return varCustomers != null? varCustomers: List.of();
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetAll(attFnGetAllCustomers);
 	}
 	// endregion
 }

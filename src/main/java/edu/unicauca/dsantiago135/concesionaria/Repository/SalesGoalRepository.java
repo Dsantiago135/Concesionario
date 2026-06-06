@@ -10,13 +10,12 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import edu.unicauca.dsantiago135.concesionaria.Error.excDatabaseException;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsDealership;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsEmployee;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsSalesGoal;
 
 @Repository
-public class SalesGoalRepository {
+public class SalesGoalRepository extends BaseRepository<clsSalesGoal>{
 
 	// region ATTRIBUTES
 	private final JdbcTemplate attJdbcTemplate;
@@ -133,83 +132,37 @@ public class SalesGoalRepository {
 
 	// region PROCEDURES
 	public int opRegisterSalesGoal(clsSalesGoal prmSalesGoal){
-		Map<String, Object> varResult = null;
-		try {
-			varResult = attSpRegisterSalesGoal.execute(opToParams(prmSalesGoal));
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
-		Number varId = (Number) varResult.get("P_SGL_ID");
-		return varId.intValue();
+		return opRegister(attSpRegisterSalesGoal, opToParams(prmSalesGoal), "P_SGL_ID");
 	}
 	
 	public void opUpdateSalesGoal(clsSalesGoal prmSalesGoal){
-		try {
-			attSpUpdateSalesGoal.execute(opToParams(prmSalesGoal));
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opUpdate(attSpUpdateSalesGoal, opToParams(prmSalesGoal));
 	}
 	
 	public void opDisableSalesGoal(int prmId){
-		try {
-			attSpDisableSalesGoal.execute(opToId(prmId));
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opDisable(attSpDisableSalesGoal, opToId(prmId));
 	}
 	
 	public void opCompleteSalesGoal(int prmId){
-		try {
-			attSpCompleteSalesGoal.execute(opToId(prmId));
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opUpdate(attSpCompleteSalesGoal, opToId(prmId));
 	}
 	
 	public boolean opSalesGoalExist(int prmId){
-		try {
-			Boolean varResult = attFnSalesGoalExist.executeFunction(Boolean.class, opToId(prmId));
-			return Boolean.TRUE.equals(varResult);
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opExist(attFnSalesGoalExist, opToId(prmId));
 	}
 	
 	public clsSalesGoal opGetSalesGoalById(int prmId){
-		try {
-			Map<String, Object> varResult = attFnGetSalesGoalById.execute(opToId(prmId));
-			@SuppressWarnings("unchecked")
-			List<clsSalesGoal> varList = (List<clsSalesGoal>) varResult.get("return");
-			if (varList == null || varList.isEmpty()) return null;
-			return varList.get(0);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
-}
+		return opGetById(attFnGetSalesGoalById, opToId(prmId));
+	}
 	
 	public List<clsSalesGoal> opGetAllSalesGoals(){
-		try {
-			Map<String, Object> varResult = attFnGetAllSalesGoals.execute();
-			@SuppressWarnings("unchecked")
-			List<clsSalesGoal> varSalesGoal = (List<clsSalesGoal>) varResult.get("return");
-			return varSalesGoal != null? varSalesGoal: List.of();
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetAll(attFnGetAllSalesGoals);
 	}
 
 	public List<clsSalesGoal> opGetSalesGoalsByState(String prmState){
-		try {
-			MapSqlParameterSource varParams = new MapSqlParameterSource();
-			varParams.addValue("P_SGL_STATE", prmState);
-			Map<String, Object> varResult = attFnGetSalesGoalsByState.execute(varParams);
-			@SuppressWarnings("unchecked")
-			List<clsSalesGoal> varSalesGoal = (List<clsSalesGoal>) varResult.get("return");
-			return varSalesGoal != null? varSalesGoal: List.of();
-		} catch (excDatabaseException e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		MapSqlParameterSource varParams = new MapSqlParameterSource();
+		varParams.addValue("P_SGL_STATE", prmState);
+		return opGetByFilter(attFnGetSalesGoalsByState, varParams);
 	}
 	// endregion
 

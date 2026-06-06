@@ -10,14 +10,13 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import edu.unicauca.dsantiago135.concesionaria.Error.excDatabaseException;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsCustomer;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsEmployee;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsSale;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsUnit;
 
 @Repository
-public class SaleRepository {
+public class SaleRepository extends BaseRepository<clsSale>{
 
 	// region ATTRIBUTES
 	private final JdbcTemplate attJdbcTemplate;
@@ -139,86 +138,37 @@ public class SaleRepository {
 
 	// region PROCEDURES
 	public int opRegisterSale(clsSale prmSale){
-		Map<String, Object> varResult = null;
-		try {
-			varResult = attSpRegisterSale.execute(opToParams(prmSale));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
-		Number varId = (Number) varResult.get("P_SALE_ID");
-		return varId.intValue();
+		return opRegister(attSpRegisterSale, opToParams(prmSale),"P_SALE_ID");
 	}
 	
 	public int opRegisterReservation(clsSale prmSale){
-		Map<String, Object> varResult = null;
-		try {
-			varResult = attSpRegisterReservation.execute(opToParams(prmSale));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
-		Number varId = (Number) varResult.get("P_SALE_ID");
-		return varId.intValue();
+		return opRegister(attSpRegisterReservation, opToParams(prmSale), "P_SALE_ID");
 	}
 	
 	public void opCompleteReservation(int prmId){
-		try {
-			attSpCompleteReservation.execute(opToId(prmId));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opUpdate(attSpCompleteReservation, opToId(prmId));
 	}
 	
 	public void opCancelReservation(int prmId){
-		try {
-			attSpCancelReservation.execute(opToId(prmId));
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		opUpdate(attSpCancelReservation, opToId(prmId));
 	}
 	
 	public boolean opSaleExist(int prmId){
-		try {
-			Boolean varResult = attFnSaleExist.executeFunction(Boolean.class,opToId(prmId));
-			return Boolean.TRUE.equals(varResult);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opExist(attFnSaleExist, opToId(prmId));
 	}
 	
 	public clsSale opGetSaleById(int prmId){
-		try {
-			Map<String, Object> varResult = attFnGetSaleById.execute(opToId(prmId));
-			@SuppressWarnings("unchecked")
-			List<clsSale> varList = (List<clsSale>) varResult.get("return");
-			if (varList == null || varList.isEmpty()) return null;
-			return varList.get(0);
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
-}
+		return opGetById(attFnGetSaleById, opToId(prmId));
+	}
 	
 	public List<clsSale> opGetAllSales(){
-		try {
-			Map<String, Object> varResult = attFnGetAllSales.execute();
-			@SuppressWarnings("unchecked")
-			List<clsSale> varSales = (List<clsSale>) varResult.get("return");
-			return varSales != null? varSales: List.of();
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		return opGetAll(attFnGetAllSales);
 	}
 	
 	public List<clsSale> opGetSalesByStatus(String prmStatus){
-		try {
-			MapSqlParameterSource varParams = new MapSqlParameterSource();
-			varParams.addValue("P_SALE_STATUS", prmStatus);
-			Map<String, Object> varResult = attFnGetSalesByStatus.execute(varParams);
-			@SuppressWarnings("unchecked")
-			List<clsSale> varSales = (List<clsSale>) varResult.get("return");
-			return varSales != null? varSales: List.of();
-		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
-		}
+		MapSqlParameterSource varParams = new MapSqlParameterSource();
+		varParams.addValue("P_SALE_STATUS", prmStatus);
+		return opGetByFilter(attFnGetSalesByStatus, varParams);
 	}
 	// endregion
 
