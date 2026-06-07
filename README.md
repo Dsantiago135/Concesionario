@@ -223,7 +223,10 @@ mvn spring-boot:run
 # 📊 Modelos del Sistema
 
 * Modelo Conceptual
+  <img width="468" height="417" alt="{49EBDFAF-0D73-49E1-A0F0-2FA801512531}" src="https://github.com/user-attachments/assets/8ad879be-77ee-4b09-accd-6a4dbe0a8fec" />
 * Modelo Físico
+  <img width="465" height="416" alt="{65CF2DBB-DB43-40EA-ABD8-B10F809EF7D9}" src="https://github.com/user-attachments/assets/4f1ee38d-33a0-44fa-967a-72c485a2530b" />
 * Diagrama de Clases
-* Diagrama de Métodos
+  
 * Arquitectura por Capas
+  
