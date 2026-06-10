@@ -231,4 +231,6 @@ mvn spring-boot:run
 * Diagrama de Clases
   
 * Arquitectura por Capas
-  
+
+  <img width="216" height="284" alt="{5A9EB695-A02D-46C8-85DC-C6F2C0306C08}" src="https://github.com/user-attachments/assets/dbaea6af-e72b-4bdc-a115-caf82e2ffd7b" />
+
