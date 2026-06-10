@@ -232,7 +232,7 @@ mvn spring-boot:run
   
   <img width="667" height="361" alt="{361586BA-11E0-40CF-890E-920583B6450B}" src="https://github.com/user-attachments/assets/54ea4f99-e0be-4c8e-80d0-729e251001eb" />
  
-  <img width="407" height="417" alt="{972BDC71-26D6-4150-9FBD-319CCD5AB2DD}" src="https://github.com/user-attachments/assets/fefb7569-456d-4a27-b43f-464017ea1f7a" />
+  
  
   <img width="674" height="427" alt="{9D3651B0-558B-4916-8F51-6AE1A2C50CE7}" src="https://github.com/user-attachments/assets/be92b750-312a-4b37-8555-24ff87d1d46b" />
 
