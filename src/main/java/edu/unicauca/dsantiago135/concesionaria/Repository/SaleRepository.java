@@ -66,15 +66,20 @@ public class SaleRepository extends BaseRepository<clsSale>{
 	 * @param prmSale objeto de tipo {@link clsSale} con los datos de la venta
 	 * @return {@link MapSqlParameterSource} con los parámetros mapeados para Oracle
 	 */
-	private MapSqlParameterSource opToParams(clsSale prmSale) {
+	private MapSqlParameterSource opToRegisterSaleParams(clsSale prmSale) {
 		return new MapSqlParameterSource()
-				.addValue("P_SALE_ID", prmSale.getAttSaleId())
 				.addValue("P_CUS_ID", prmSale.getAttCustomer().getAttCustomerId())
 				.addValue("P_EMP_ID", prmSale.getAttEmployee().getAttEmployeeId())
 				.addValue("P_UNIT_ID", prmSale.getAttUnit().getAttUnitId())
-				.addValue("P_SALE_DATE_START", prmSale.getAttDateStart())
+				.addValue("P_SALE_PRICE", prmSale.getAttPrice());
+	}
+
+	private MapSqlParameterSource opToRegisterReservationParams(clsSale prmSale) {
+		return new MapSqlParameterSource()
+				.addValue("P_CUS_ID", prmSale.getAttCustomer().getAttCustomerId())
+				.addValue("P_EMP_ID", prmSale.getAttEmployee().getAttEmployeeId())
+				.addValue("P_UNIT_ID", prmSale.getAttUnit().getAttUnitId())
 				.addValue("P_SALE_PRICE", prmSale.getAttPrice())
-				.addValue("P_SALE_STATUS", prmSale.getAttStatus())
 				.addValue("P_SALE_DATE_END", prmSale.getAttDateEnd());
 	}
 
@@ -138,11 +143,11 @@ public class SaleRepository extends BaseRepository<clsSale>{
 
 	// region PROCEDURES
 	public int opRegisterSale(clsSale prmSale){
-		return opRegister(attSpRegisterSale, opToParams(prmSale),"P_SALE_ID");
+		return opRegister(attSpRegisterSale, opToRegisterSaleParams(prmSale), "P_SALE_ID");
 	}
 	
 	public int opRegisterReservation(clsSale prmSale){
-		return opRegister(attSpRegisterReservation, opToParams(prmSale), "P_SALE_ID");
+		return opRegister(attSpRegisterReservation, opToRegisterReservationParams(prmSale), "P_SALE_ID");
 	}
 	
 	public void opCompleteReservation(int prmId){

@@ -1,6 +1,7 @@
 package edu.unicauca.dsantiago135.concesionaria.Service;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.time.Year;
 
 import edu.unicauca.dsantiago135.concesionaria.Error.excValidationException;
@@ -51,6 +52,15 @@ public class clsValidations {
          throw new excValidationException("Error: " + prmField + " debe ser mayor a cero");
    }
 
+   /** Máximo compatible con NUMBER(15,2) en Oracle. */
+   private static final double SALE_PRICE_MAX = 9_999_999_999_999.99;
+
+   public static void opValidateSalePrice(double prmPrice) throws excValidationException {
+      opValidatePositiveNumber(prmPrice, "el precio de la venta");
+      if (prmPrice > SALE_PRICE_MAX)
+         throw new excValidationException("Error: el precio de la venta excede el máximo permitido");
+   }
+
    public static void opValidateLicensePlate(String prmPlate) throws excValidationException {
       if (prmPlate == null || !prmPlate.toUpperCase().trim().matches("^[A-Z]{3}[0-9]{3}$"))
          throw new excValidationException("Error: Placa inválida");
@@ -98,6 +108,17 @@ public class clsValidations {
    public static void opValidateDateRange(Date prmStartDate, Date prmEndDate) throws excValidationException {
       if (prmEndDate != null && prmEndDate.before(prmStartDate))
          throw new excValidationException("Error: La fecha final no puede ser menor a la inicial");
+   }
+
+   /**
+    * Valida la fecha fin de una reserva: opcional, pero si se indica debe ser hoy o posterior.
+    */
+   public static void opValidateReservationEndDate(Date prmDateEnd) throws excValidationException {
+      if (prmDateEnd == null)
+         return;
+      LocalDate varEnd = prmDateEnd.toLocalDate();
+      if (varEnd.isBefore(LocalDate.now()))
+         throw new excValidationException("Error: La fecha fin de reserva no puede ser anterior a hoy");
    }
 
    public static void opValidateVehicleFuelType(String prmFuelType) throws excValidationException {

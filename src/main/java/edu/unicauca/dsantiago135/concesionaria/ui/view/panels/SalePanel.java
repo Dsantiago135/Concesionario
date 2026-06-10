@@ -37,7 +37,7 @@ public class SalePanel {
         ComboBox<String> statusFilter = new ComboBox<>();
         statusFilter.getItems().addAll("confirmed","cancelled","inprogress");
         statusFilter.setValue("confirmed");
-        var dateEnd = UiKit.datePicker("Fecha fin reserva");
+        var dateEnd = UiKit.datePicker("Fecha fin reserva (opcional)");
 
         UiKit.runSilent(() -> {
             UiKit.populateEntityCombo(customerId, controller.opGetAllCustomers().stream()
@@ -97,7 +97,7 @@ public class SalePanel {
         			resolveEmployeeId(employeeId),
         			UiKit.requireSelectedId(unitId, "unidad"),
         			UiKit.parseDouble(price.getText(), "Precio"),
-        			UiKit.toSqlDate(dateEnd));
+        			UiKit.toSqlDateOrNull(dateEnd));
         	clearForm.run();
         }));
 

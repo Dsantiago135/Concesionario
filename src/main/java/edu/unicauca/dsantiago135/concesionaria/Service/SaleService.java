@@ -72,7 +72,7 @@ public class SaleService {
       clsValidations.opValidateId(prmIdEmployee);
       clsValidations.opValidateId(prmIdCustomer);
 
-      clsValidations.opValidatePositiveNumber(prmPrice, "el precio de la venta");
+      clsValidations.opValidateSalePrice(prmPrice);
 
       clsSale varTemp = new clsSale();
       varTemp.setAttSaleId(-1);
@@ -92,7 +92,7 @@ public class SaleService {
       try {
          varId = attSaleRepository.opRegisterSale(varTemp);
       } catch (excDatabaseException e) {
-         throw new excDatabaseException("Error al registrar venta: ",e);
+         throw new excDatabaseException("Error al registrar venta: " + e.getMessage(), e);
       }
 
       opRefreshCache(varId);
@@ -103,8 +103,8 @@ public class SaleService {
       clsValidations.opValidateId(prmIdEmployee);
       clsValidations.opValidateId(prmIdCustomer);
 
-      clsValidations.opValidatePositiveNumber(prmPrice, "el precio de la venta");
-      clsValidations.opValidateDate(prmDateEnd);
+      clsValidations.opValidateSalePrice(prmPrice);
+      clsValidations.opValidateReservationEndDate(prmDateEnd);
 
       clsSale varTemp = new clsSale();
       varTemp.setAttPrice(prmPrice);
@@ -123,7 +123,7 @@ public class SaleService {
       try {
          varId = attSaleRepository.opRegisterReservation(varTemp);
       } catch (excDatabaseException e) {
-         throw new excDatabaseException("Error al registrar la reserva: ",e);
+         throw new excDatabaseException("Error al registrar la reserva: " + e.getMessage(), e);
       }
 
       opRefreshCache(varId);

@@ -10,11 +10,30 @@ import edu.unicauca.dsantiago135.concesionaria.Error.excDatabaseException;
 
 public abstract class BaseRepository <T>{
 
+   private static String opExtractMessage(Exception prmException) {
+      Throwable varCurrent = prmException;
+      while (varCurrent != null) {
+         String varMessage = varCurrent.getMessage();
+         if (varMessage != null && !varMessage.isBlank()) {
+            int varOraIndex = varMessage.indexOf("ORA-");
+            if (varOraIndex >= 0) {
+               int varEnd = varMessage.indexOf('\n', varOraIndex);
+               return varEnd > varOraIndex
+                     ? varMessage.substring(varOraIndex, varEnd).trim()
+                     : varMessage.substring(varOraIndex).trim();
+            }
+            return varMessage.trim();
+         }
+         varCurrent = varCurrent.getCause();
+      }
+      return prmException.toString();
+   }
+
    public void opRegister(SimpleJdbcCall prmCall, MapSqlParameterSource prmObject){
       try {
 			prmCall.execute(prmObject);
 		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
+			throw new excDatabaseException(opExtractMessage(e), e);
 		}
    }
 
@@ -23,9 +42,11 @@ public abstract class BaseRepository <T>{
 		try {
 			varResult=prmCall.execute(prmIdObject);
 		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
+			throw new excDatabaseException(opExtractMessage(e), e);
 		}
 		Number varId = (Number)varResult.get(prmResult);
+		if (varId == null)
+			throw new excDatabaseException("No se recibió el identificador generado por la base de datos");
 		return varId.intValue();
 	}
 	
@@ -33,7 +54,7 @@ public abstract class BaseRepository <T>{
       try {
 			prmCall.execute(prmObject);
 		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
+			throw new excDatabaseException(opExtractMessage(e), e);
 		}
    }
 
@@ -41,7 +62,7 @@ public abstract class BaseRepository <T>{
       try {
 			prmCall.execute(prmObject);
 		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
+			throw new excDatabaseException(opExtractMessage(e), e);
 		}
    }
 
@@ -50,7 +71,7 @@ public abstract class BaseRepository <T>{
 			Boolean varResult = prmCall.executeFunction(Boolean.class, prmObject);
 			return Boolean.TRUE.equals(varResult);
 		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
+			throw new excDatabaseException(opExtractMessage(e), e);
 		}
    }
 
@@ -63,7 +84,7 @@ public abstract class BaseRepository <T>{
 			if (varList == null || varList.isEmpty()) return null;
 			varObject = varList.get(0);
 		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
+			throw new excDatabaseException(opExtractMessage(e), e);
 		}
       return varObject;
    }
@@ -75,7 +96,7 @@ public abstract class BaseRepository <T>{
 			List<T> varList = (List<T>) varResult.get("return");
          return varList != null? varList: List.of();
 		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
+			throw new excDatabaseException(opExtractMessage(e), e);
 		}
    }
 
@@ -86,7 +107,7 @@ public abstract class BaseRepository <T>{
 			List<T> varList = (List<T>) varResult.get("return");
 			return varList != null? varList: List.of();
 		} catch (Exception e) {
-			throw new excDatabaseException(e.getMessage());
+			throw new excDatabaseException(opExtractMessage(e), e);
 		}
    }
 }

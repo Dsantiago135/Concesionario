@@ -111,7 +111,7 @@ CREATE TABLE TBL_SALE
    EMP_ID               NUMBER               NOT NULL,
    UNIT_ID              NUMBER               NOT NULL,
    SALE_DATE_START      DATE                 NOT NULL,
-   SALE_PRICE           NUMBER(9,2)          NOT NULL,
+   SALE_PRICE           NUMBER(15,2)         NOT NULL,
    SALE_STATUS          VARCHAR2(10)          NOT NULL
       CONSTRAINT CKC_SALE_STATUS_TBL_SALE CHECK (SALE_STATUS IN ('confirmed','cancelled','inprogress')),
    SALE_DATE_END        DATE,
