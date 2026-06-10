@@ -1,8 +1,10 @@
 package edu.unicauca.dsantiago135.concesionaria.Service;
 
 import java.sql.Date;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,8 @@ import edu.unicauca.dsantiago135.concesionaria.Error.excNotFoundException;
 import edu.unicauca.dsantiago135.concesionaria.Error.excValidationException;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsDealership;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsEmployee;
+import edu.unicauca.dsantiago135.concesionaria.Model.DTOEmployeeReport;
+import edu.unicauca.dsantiago135.concesionaria.Model.DTOReport;
 import edu.unicauca.dsantiago135.concesionaria.Repository.EmployeeRepository;
 
 @Service
@@ -198,6 +202,41 @@ public class EmployeeService {
          throw new excDatabaseException("Error al obtener empleados: ", e);
       }
       return varEmployees;
+   }
+
+   public DTOReport opGeneratePerformanceReport() {
+      List<clsEmployee> varAllEmployees = opGetAllEmployees();
+
+      double varAvgSalary = varAllEmployees.stream()
+            .mapToDouble(clsEmployee::getAttSalary)
+            .average()
+            .orElse(0.0);
+
+      List<DTOEmployeeReport> varDetails = opGetEmployeesAboveAvg().stream()
+            .map(varEmployee -> {
+               DTOEmployeeReport varRow = new DTOEmployeeReport();
+               varRow.setAttEmployeeId(varEmployee.getAttEmployeeId());
+               varRow.setAttName(varEmployee.getAttName());
+               varRow.setAttRole(varEmployee.getAttRole());
+               varRow.setAttDealershipName(varEmployee.getAttDealership().getAttName());
+               varRow.setAttSalary(varEmployee.getAttSalary());
+               varRow.setAttAvgSalary(varAvgSalary);
+               varRow.setAttDifferenceFromAvg(varEmployee.getAttSalary() - varAvgSalary);
+               varRow.setAttPercentAboveAvg(
+                     varAvgSalary > 0
+                           ? ((varEmployee.getAttSalary() - varAvgSalary) / varAvgSalary) * 100
+                           : 0);
+               return varRow;
+            })
+            .sorted(Comparator.comparingDouble(DTOEmployeeReport::getAttSalary).reversed())
+            .collect(Collectors.toList());
+
+      DTOReport varReport = new DTOReport();
+      varReport.setAttAvgSalary(varAvgSalary);
+      varReport.setAttTotalEmployees(varAllEmployees.size());
+      varReport.setAttEmployeesAboveAvg(varDetails.size());
+      varReport.setAttDetails(varDetails);
+      return varReport;
    }
    // endregion
 }

@@ -187,6 +187,15 @@ public class clsController {
         return attEmployeeService.opGetEmployeesAboveAvg();
     }
 
+    /**
+     * Genera el reporte de rendimiento salarial de empleados sobre el promedio.
+     *
+     * @return resumen y detalle del reporte de rendimiento
+     */
+    public DTOReport opGeneratePerformanceReport() {
+        return attEmployeeService.opGeneratePerformanceReport();
+    }
+
     // endregion
 
     // region CUSTOMER

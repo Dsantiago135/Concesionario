@@ -4,9 +4,9 @@ spring:
   main:
     web-application-type: none
   datasource:
-    url: jdbc:oracle:thin:@//localhost:1521/XEPDB1
-    username: concesionario
-    password: 123456
+    url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+    username: Gerente
+    password: admin
     driver-class-name: oracle.jdbc.OracleDriver
 
   jpa:

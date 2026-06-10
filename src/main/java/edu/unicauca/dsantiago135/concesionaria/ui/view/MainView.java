@@ -8,6 +8,7 @@ import edu.unicauca.dsantiago135.concesionaria.ui.view.panels.CustomerPanel;
 import edu.unicauca.dsantiago135.concesionaria.ui.view.panels.DealershipPanel;
 import edu.unicauca.dsantiago135.concesionaria.ui.view.panels.EmployeePanel;
 import edu.unicauca.dsantiago135.concesionaria.ui.view.panels.SalePanel;
+import edu.unicauca.dsantiago135.concesionaria.ui.view.panels.ReportsPanel;
 import edu.unicauca.dsantiago135.concesionaria.ui.view.panels.SalesGoalPanel;
 import edu.unicauca.dsantiago135.concesionaria.ui.view.panels.UnitPanel;
 import edu.unicauca.dsantiago135.concesionaria.ui.view.panels.VehiclePanel;
@@ -57,6 +58,7 @@ public class MainView {
         tabs.getTabs().add(createTab("Unidades", new UnitPanel(controller).getContent()));
         tabs.getTabs().add(createTab("Ventas", new SalePanel(controller).getContent()));
         tabs.getTabs().add(createTab("Metas", new SalesGoalPanel(controller).getContent()));
+        tabs.getTabs().add(createTab("Reportes", new ReportsPanel(controller).getContent()));
 
         root.setTop(topBar);
         root.setCenter(tabs);

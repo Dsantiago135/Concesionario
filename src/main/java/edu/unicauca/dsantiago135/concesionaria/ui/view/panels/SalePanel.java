@@ -5,6 +5,7 @@ import edu.unicauca.dsantiago135.concesionaria.Model.clsSale;
 import edu.unicauca.dsantiago135.concesionaria.ui.service.SessionContext;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.TableHelper;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.UiKit;
+import edu.unicauca.dsantiago135.concesionaria.ui.util.UiKit.EntityOption;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
@@ -28,22 +29,32 @@ public class SalePanel {
 
     public VBox getContent() {
         var saleId = UiKit.field("ID venta/reserva");
-        var customerId = UiKit.field("ID cliente");
+        ComboBox<EntityOption> customerId = UiKit.entityCombo("Seleccione cliente");
         var employeeId = UiKit.field("ID empleado (vacío = sesión actual)");
-        var unitId = UiKit.field("ID unidad");
+        ComboBox<EntityOption> unitId = UiKit.entityCombo("Seleccione unidad");
         var price = UiKit.field("Precio");
         //var statusFilter = UiKit.field("Estado filtro (confirmed/cancelled/inprogress)");
         ComboBox<String> statusFilter = new ComboBox<>();
         statusFilter.getItems().addAll("confirmed","cancelled","inprogress");
         statusFilter.setValue("confirmed");
         var dateEnd = UiKit.datePicker("Fecha fin reserva");
-        
-        
+
+        UiKit.runSilent(() -> {
+            UiKit.populateEntityCombo(customerId, controller.opGetAllCustomers().stream()
+                    .filter(c -> "active".equalsIgnoreCase(c.getAttState()))
+                    .map(c -> new EntityOption(c.getAttCustomerId(), c.getAttName()))
+                    .toList());
+            UiKit.populateEntityCombo(unitId, controller.opGetAvailableUnits().stream()
+                    .map(u -> new EntityOption(u.getAttUnitId(),
+                            u.getAttLicensePlate() + " — " + u.getAttColor()))
+                    .toList());
+        });
+
         Runnable clearForm = () ->  {
             saleId.clear();
-            customerId.clear();
+            customerId.setValue(null);
             employeeId.clear();
-            unitId.clear();
+            unitId.setValue(null);
             price.clear();
             statusFilter.setValue("new");
             dateEnd.setValue(null);
@@ -59,9 +70,9 @@ public class SalePanel {
 
         GridPane form = UiKit.formGrid(2);
         UiKit.addFormRow(form, 0, "ID venta", saleId);
-        UiKit.addFormRow(form, 1, "ID cliente", customerId);
+        UiKit.addFormRow(form, 1, "Cliente", customerId);
         UiKit.addFormRow(form, 2, "ID empleado", employeeId);
-        UiKit.addFormRow(form, 3, "ID unidad", unitId);
+        UiKit.addFormRow(form, 3, "Unidad", unitId);
         UiKit.addFormRow(form, 4, "Precio", price);
         UiKit.addFormRow(form, 5, "Estado filtro", statusFilter);
         UiKit.addFormRow(form, 6, "Fin reserva", dateEnd);
@@ -72,9 +83,9 @@ public class SalePanel {
         var registerSaleBtn = UiKit.primaryButton("Venta directa (opRegisterSale)");
         registerSaleBtn.setOnAction(e -> UiKit.run(() -> {
         	controller.opRegisterSale(
-        			UiKit.parseInt(customerId.getText(), "ID cliente"),
+        			UiKit.requireSelectedId(customerId, "cliente"),
         			resolveEmployeeId(employeeId),
-        			UiKit.parseInt(unitId.getText(), "ID unidad"),
+        			UiKit.requireSelectedId(unitId, "unidad"),
         			UiKit.parseDouble(price.getText(), "Precio"));
         	clearForm.run();
         }));
@@ -82,9 +93,9 @@ public class SalePanel {
         var registerResBtn = UiKit.primaryButton("Reservar (opRegisterReservation)");
         registerResBtn.setOnAction(e -> UiKit.run(() -> {
         	controller.opRegisterReservation(
-        			UiKit.parseInt(customerId.getText(), "ID cliente"),
+        			UiKit.requireSelectedId(customerId, "cliente"),
         			resolveEmployeeId(employeeId),
-        			UiKit.parseInt(unitId.getText(), "ID unidad"),
+        			UiKit.requireSelectedId(unitId, "unidad"),
         			UiKit.parseDouble(price.getText(), "Precio"),
         			UiKit.toSqlDate(dateEnd));
         	clearForm.run();

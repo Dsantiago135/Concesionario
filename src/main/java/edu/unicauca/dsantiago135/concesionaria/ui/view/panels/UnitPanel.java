@@ -4,6 +4,7 @@ import edu.unicauca.dsantiago135.concesionaria.Controller.clsController;
 import edu.unicauca.dsantiago135.concesionaria.Model.clsUnit;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.TableHelper;
 import edu.unicauca.dsantiago135.concesionaria.ui.util.UiKit;
+import edu.unicauca.dsantiago135.concesionaria.ui.util.UiKit.EntityOption;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
@@ -27,8 +28,8 @@ public class UnitPanel {
 
     public VBox getContent() {
         var id = UiKit.field("ID unidad");
-        var vehicleId = UiKit.field("ID vehículo");
-        var dealershipId = UiKit.field("ID concesionaria");
+        ComboBox<EntityOption> vehicleId = UiKit.entityCombo("Seleccione vehículo");
+        ComboBox<EntityOption> dealershipId = UiKit.entityCombo("Seleccione concesionaria");
         var plate = UiKit.field("Placa (AAA000)");
         var color = UiKit.field("Color");
         var mileage = UiKit.field("Kilometraje");
@@ -41,12 +42,23 @@ public class UnitPanel {
         status.getItems().addAll("available","reserved","sold");
         status.setValue("available");
         var dateEntry = UiKit.datePicker("Fecha ingreso");
-        
-        
+
+        UiKit.runSilent(() -> {
+            UiKit.populateEntityCombo(vehicleId, controller.opGetAllVehicles().stream()
+                    .filter(v -> "active".equalsIgnoreCase(v.getAttState()))
+                    .map(v -> new EntityOption(v.getAttVehicleId(),
+                            v.getAttBrand() + " " + v.getAttModel() + " (" + v.getAttYear() + ")"))
+                    .toList());
+            UiKit.populateEntityCombo(dealershipId, controller.opGetAllDealerships().stream()
+                    .filter(d -> "active".equalsIgnoreCase(d.getAttState()))
+                    .map(d -> new EntityOption(d.getAttDealershipId(), d.getAttName()))
+                    .toList());
+        });
+
         Runnable clearForm = () -> {
             id.clear();
-            vehicleId.clear();
-            dealershipId.clear();
+            vehicleId.setValue(null);
+            dealershipId.setValue(null);
             plate.clear();
             color.clear();
             mileage.clear();
@@ -59,8 +71,8 @@ public class UnitPanel {
 
         GridPane form = UiKit.formGrid(2);
         UiKit.addFormRow(form, 0, "ID unidad", id);
-        UiKit.addFormRow(form, 1, "ID vehículo", vehicleId);
-        UiKit.addFormRow(form, 2, "ID concesionaria", dealershipId);
+        UiKit.addFormRow(form, 1, "Vehículo", vehicleId);
+        UiKit.addFormRow(form, 2, "Concesionaria", dealershipId);
         UiKit.addFormRow(form, 3, "Placa", plate);
         UiKit.addFormRow(form, 4, "Color", color);
         UiKit.addFormRow(form, 5, "Kilometraje", mileage);
@@ -75,8 +87,8 @@ public class UnitPanel {
         var registerBtn = UiKit.managerButton("Registrar (opRegisterUnit)", () -> {
         	controller.opRegisterUnit(
         			UiKit.parseInt(id.getText(), "ID unidad"),
-        			UiKit.parseInt(vehicleId.getText(), "ID vehículo"),
-        			UiKit.parseInt(dealershipId.getText(), "ID concesionaria"),
+        			UiKit.requireSelectedId(vehicleId, "vehículo"),
+        			UiKit.requireSelectedId(dealershipId, "concesionaria"),
         			UiKit.requireNonBlank(plate.getText(), "Placa"),
         			UiKit.requireNonBlank(color.getText(), "Color"),
         			UiKit.parseInt(mileage.getText(), "Kilometraje"),

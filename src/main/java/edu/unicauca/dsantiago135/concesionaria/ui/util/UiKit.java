@@ -7,8 +7,10 @@ import edu.unicauca.dsantiago135.concesionaria.ui.service.SessionContext;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -20,7 +22,16 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
+
 public final class UiKit {
+
+    public record EntityOption(int id, String label) {
+        @Override
+        public String toString() {
+            return id + " — " + label;
+        }
+    }
 
     private UiKit() {
     }
@@ -55,6 +66,27 @@ public final class UiKit {
         dp.setPromptText(prompt);
         dp.setStyle(inputStyle());
         return dp;
+    }
+
+    public static ComboBox<EntityOption> entityCombo(String prompt) {
+        ComboBox<EntityOption> combo = new ComboBox<>();
+        combo.setPromptText(prompt);
+        combo.setStyle(inputStyle());
+        combo.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(combo, Priority.ALWAYS);
+        return combo;
+    }
+
+    public static void populateEntityCombo(ComboBox<EntityOption> combo, List<EntityOption> options) {
+        combo.setItems(FXCollections.observableArrayList(options));
+    }
+
+    public static int requireSelectedId(ComboBox<EntityOption> combo, String fieldName) {
+        EntityOption selected = combo.getValue();
+        if (selected == null) {
+            throw new IllegalArgumentException("Debe seleccionar: " + fieldName);
+        }
+        return selected.id();
     }
 
     public static Button primaryButton(String text) {
